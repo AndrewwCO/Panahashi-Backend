@@ -1,0 +1,17 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAgvCRHhhxFRI6T5xmczblP8AGpA1bzKG8",
+  authDomain: "panahashi-backend.firebaseapp.com",
+  projectId: "panahashi-backend",
+  storageBucket: "panahashi-backend.firebasestorage.app",
+  messagingSenderId: "981410583680",
+  appId: "1:981410583680:web:a6b4be94c6a473d0800265"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);

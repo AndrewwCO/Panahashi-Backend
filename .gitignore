@@ -1,0 +1,10 @@
+.gradle/
+build/
+*.class
+*.jar
+serviceAccountKey.json
+.env
+*.env
+out/
+.idea/
+*.iml
