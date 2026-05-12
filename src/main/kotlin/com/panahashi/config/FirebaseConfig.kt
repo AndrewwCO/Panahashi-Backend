@@ -30,10 +30,16 @@ fun Application.configureFirebase() {
                 ?: System.getenv("FIREBASE_DATABASE_URL")
                 ?: "https://panahashi-default-rtdb.firebaseio.com"
         )
+        // ← NUEVO: bucket de Firebase Storage (formato: tu-proyecto.appspot.com)
+        .setStorageBucket(
+            environment.config.propertyOrNull("firebase.storageBucket")?.getString()
+                ?: System.getenv("FIREBASE_STORAGE_BUCKET")
+                ?: "panahashi.appspot.com"
+        )
         .build()
 
     if (FirebaseApp.getApps().isEmpty()) {
         FirebaseApp.initializeApp(options)
-        logger.info("✅ Firebase inicializado correctamente")
+        logger.info("✅ Firebase inicializado correctamente (Auth + Firestore + Storage + FCM)")
     }
 }

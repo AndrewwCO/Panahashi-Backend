@@ -37,7 +37,9 @@ dependencies {
     implementation("io.ktor:ktor-server-cors:$ktorVersion")
     implementation("io.ktor:ktor-server-status-pages:$ktorVersion")
     implementation("io.ktor:ktor-server-request-validation:$ktorVersion")
-    implementation("io.ktor:ktor-server-cors:$ktorVersion")
+
+    // ← Multipart: necesario para recibir archivos (fotos)
+    implementation("io.ktor:ktor-server-partial-content:${ktorVersion}")
 
     // Firebase Admin SDK
     implementation("com.google.firebase:firebase-admin:9.4.2")
