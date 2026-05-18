@@ -27,12 +27,7 @@ fun Route.productRoutes() {
             call.respond(ApiResponse(success = true, data = products))
         }
 
-        // GET /api/v1/products/{id} — detalle de un producto
-        get("{id}") {
-            val id      = call.parameters["id"] ?: throw IllegalArgumentException("id requerido")
-            val product = ProductService.getProductById(id)
-            call.respond(ApiResponse(success = true, data = product))
-        }
+
 
         authenticate("firebase-auth") {
 
@@ -51,6 +46,29 @@ fun Route.productRoutes() {
                 val request  = call.receive<CreateProductRequest>()
                 val product  = ProductService.createProduct(bakeryId, request)
                 call.respond(HttpStatusCode.Created, ApiResponse(success = true, data = product))
+            }
+
+            // POST /api/v1/products/seed — datos de prueba
+            post("seed") {
+                val bakeryId = call.getBakeryId()
+                ProductService.seedInitialProducts(bakeryId)
+                call.respond(ApiResponse<Unit>(success = true, message = "Productos cargados"))
+            }
+
+            // ── ADMIN ────────────────────────────────────────────────
+
+            // GET /api/v1/products/admin/all — todos de todas las panaderías
+            get("admin/all") {
+                if (!call.requireAdmin()) return@get
+                val products = ProductService.getAllProducts()
+                call.respond(ApiResponse(success = true, data = products))
+            }
+
+            // GET /api/v1/products/{id} — detalle de un producto
+            get("{id}") {
+                val id      = call.parameters["id"] ?: throw IllegalArgumentException("id requerido")
+                val product = ProductService.getProductById(id)
+                call.respond(ApiResponse(success = true, data = product))
             }
 
             // NUEVO: PATCH /api/v1/products/{id} — editar producto completo
@@ -82,21 +100,7 @@ fun Route.productRoutes() {
                 call.respond(ApiResponse<Unit>(success = true, message = "Producto eliminado"))
             }
 
-            // POST /api/v1/products/seed — datos de prueba
-            post("seed") {
-                val bakeryId = call.getBakeryId()
-                ProductService.seedInitialProducts(bakeryId)
-                call.respond(ApiResponse<Unit>(success = true, message = "Productos cargados"))
-            }
 
-            // ── ADMIN ────────────────────────────────────────────────
-
-            // GET /api/v1/products/admin/all — todos de todas las panaderías
-            get("admin/all") {
-                if (!call.requireAdmin()) return@get
-                val products = ProductService.getAllProducts()
-                call.respond(ApiResponse(success = true, data = products))
-            }
         }
     }
 }

@@ -24,10 +24,11 @@ suspend fun ApplicationCall.getUserRole(): UserRole {
  * Lanza excepción si no tiene panadería asignada.
  */
 suspend fun ApplicationCall.getBakeryId(): String {
-    val uid = principal<UserIdPrincipal>()?.name
-        ?: throw IllegalStateException("No autenticado")
-    val doc = FirestoreService.getDocument(USERS, uid)
-        ?: throw IllegalStateException("Usuario no encontrado")
+    val uid = principal<UserIdPrincipal>()?.name ?: throw IllegalStateException("No autenticado")
+    val doc = FirestoreService.getDocument(USERS, uid) ?: throw IllegalStateException("Usuario no encontrado")
+    val role = doc.getString("role") ?: UserRole.CUSTOMER.name
+    if (role != UserRole.BAKER.name && role != UserRole.ADMIN.name)
+        throw IllegalArgumentException("Acceso denegado: se requiere rol BAKER")
     return doc.getString("bakeryId")?.takeIf { it.isNotEmpty() }
         ?: throw IllegalArgumentException("Este usuario no tiene una panadería asignada")
 }

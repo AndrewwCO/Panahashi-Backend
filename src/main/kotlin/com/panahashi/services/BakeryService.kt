@@ -6,6 +6,7 @@ import com.panahashi.services.Collections.USERS
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.*
+import java.time.ZoneId
 
 object BakeryService {
 
@@ -115,7 +116,7 @@ object BakeryService {
     suspend fun toggleOpen(bakeryId: String, isOpen: Boolean): Bakery {
         if (isOpen) {
             val bakery = getBakeryById(bakeryId)
-            val now = LocalTime.now()
+            val now = LocalTime.now(ZoneId.of("America/Bogota"))
             val open  = runCatching { LocalTime.parse(bakery.openTime,  timeFormatter) }.getOrNull()
             val close = runCatching { LocalTime.parse(bakery.closeTime, timeFormatter) }.getOrNull()
 

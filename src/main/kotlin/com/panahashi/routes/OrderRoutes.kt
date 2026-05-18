@@ -40,20 +40,18 @@ fun Route.orderRoutes() {
                 call.respond(ApiResponse(success = true, data = orders))
             }
 
-            // GET /api/v1/orders/{id} — orden por id (el cliente solo ve la suya)
-            get("{id}") {
-                val uid     = call.principal<UserIdPrincipal>()!!.name
-                val orderId = call.parameters["id"] ?: throw IllegalArgumentException("id requerido")
-                val order   = OrderService.getOrderById(orderId)
 
-                if (order.userId != uid) {
-                    call.respond(HttpStatusCode.Forbidden, ApiError("FORBIDDEN", "Acceso denegado"))
-                    return@get
-                }
-                call.respond(ApiResponse(success = true, data = order))
-            }
 
             // ── BAKER ─────────────────────────────────────────────────
+
+            // POST /api/v1/orders/verify-qr — baker escanea QR del cliente
+            post("verify-qr") {
+                val bakeryId = call.getBakeryId()
+                val body     = call.receive<Map<String, String>>()
+                val qrCode   = body["qrCode"] ?: throw IllegalArgumentException("qrCode requerido")
+                val order    = OrderService.verifyQr(qrCode, bakeryId)
+                call.respond(ApiResponse(success = true, data = order))
+            }
 
             // GET /api/v1/orders/bakery?page=1&pageSize=20 — todas las órdenes de mi panadería
             get("bakery") {
@@ -79,6 +77,19 @@ fun Route.orderRoutes() {
                 call.respond(ApiResponse(success = true, data = orders))
             }
 
+            // GET /api/v1/orders/{id} — orden por id (el cliente solo ve la suya)
+            get("{id}") {
+                val uid     = call.principal<UserIdPrincipal>()!!.name
+                val orderId = call.parameters["id"] ?: throw IllegalArgumentException("id requerido")
+                val order   = OrderService.getOrderById(orderId)
+
+                if (order.userId != uid) {
+                    call.respond(HttpStatusCode.Forbidden, ApiError("FORBIDDEN", "Acceso denegado"))
+                    return@get
+                }
+                call.respond(ApiResponse(success = true, data = order))
+            }
+
             // PATCH /api/v1/orders/{id}/status — cambiar estado
             patch("{id}/status") {
                 val bakeryId = call.getBakeryId()
@@ -97,14 +108,7 @@ fun Route.orderRoutes() {
                 call.respond(ApiResponse(success = true, data = order))
             }
 
-            // POST /api/v1/orders/verify-qr — baker escanea QR del cliente
-            post("verify-qr") {
-                val bakeryId = call.getBakeryId()
-                val body     = call.receive<Map<String, String>>()
-                val qrCode   = body["qrCode"] ?: throw IllegalArgumentException("qrCode requerido")
-                val order    = OrderService.verifyQr(qrCode, bakeryId)
-                call.respond(ApiResponse(success = true, data = order))
-            }
+
 
             // ── ADMIN ─────────────────────────────────────────────────
 

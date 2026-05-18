@@ -6,6 +6,7 @@ import com.panahashi.models.ApiResponse
 import com.panahashi.services.BakeryService
 import com.panahashi.services.ProductService
 import com.panahashi.services.StorageService
+import com.panahashi.models.UpdateProductRequest
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -43,7 +44,7 @@ fun Route.uploadRoutes() {
                 val url = StorageService.uploadImage(bytes, contentType, "products/$bakeryId")
 
                 // Guardar la URL en Firestore
-                val updated = ProductService.updateProduct(productId, mapOf("imageUrl" to url))
+                val updated = ProductService.updateProduct(productId, UpdateProductRequest(imageUrl = url))
                 call.respond(ApiResponse(success = true, data = updated))
             }
 
