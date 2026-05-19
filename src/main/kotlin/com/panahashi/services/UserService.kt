@@ -14,7 +14,6 @@ object UserService {
             return doc.toUserProfile()
         }
 
-        // Si no existe, crear desde Firebase Auth con rol CUSTOMER por defecto
         val firebaseUser = FirebaseAuth.getInstance().getUser(uid)
         val profile = UserProfile(
             uid = uid,
@@ -42,7 +41,6 @@ object UserService {
         return getOrCreateProfile(uid)
     }
 
-    // Solo admin puede cambiar el rol de un usuario
     suspend fun updateRole(uid: String, newRole: UserRole): UserProfile {
         FirestoreService.updateDocument(USERS, uid, mapOf("role" to newRole.name))
         return getOrCreateProfile(uid)
@@ -53,6 +51,20 @@ object UserService {
             ?: throw NoSuchElementException("Usuario $uid no encontrado")
         if (!doc.exists()) throw NoSuchElementException("Usuario $uid no encontrado")
         return doc.toUserProfile()
+    }
+
+    // NUEVO: lista todos los usuarios registrados en Firestore
+    suspend fun getAllUsers(): List<UserProfile> {
+        return FirestoreService.getCollection(USERS)
+            .map { it.toUserProfile() }
+            .sortedBy { it.displayName.ifEmpty { it.email } }
+    }
+
+    // NUEVO: lista solo los usuarios con rol BAKER
+    suspend fun getBakers(): List<UserProfile> {
+        return FirestoreService.queryCollection(USERS, "role", UserRole.BAKER.name)
+            .map { it.toUserProfile() }
+            .sortedBy { it.displayName.ifEmpty { it.email } }
     }
 
     // ─── Helpers ─────────────────────────────────────────────

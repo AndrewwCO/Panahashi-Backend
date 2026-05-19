@@ -23,7 +23,7 @@ fun Route.userRoutes() {
                 call.respond(ApiResponse(success = true, data = profile))
             }
 
-            // PATCH /api/v1/users/me — actualizar mi perfil (nombre, teléfono, fcmToken)
+            // PATCH /api/v1/users/me — actualizar mi perfil
             patch("me") {
                 val uid = call.principal<UserIdPrincipal>()!!.name
                 val request = call.receive<UpdateProfileRequest>()
@@ -33,6 +33,21 @@ fun Route.userRoutes() {
 
             // ── ADMIN ─────────────────────────────────────────────────
 
+            // GET /api/v1/users — listar todos los usuarios (solo admin)
+            get {
+                if (!call.requireAdmin()) return@get
+                val users = UserService.getAllUsers()
+                call.respond(ApiResponse(success = true, data = users))
+            }
+
+            // GET /api/v1/users/bakers — listar solo usuarios con rol BAKER (solo admin)
+            // Usado en el panel para elegir el owner al crear una panadería
+            get("bakers") {
+                if (!call.requireAdmin()) return@get
+                val bakers = UserService.getBakers()
+                call.respond(ApiResponse(success = true, data = bakers))
+            }
+
             // GET /api/v1/users/{uid} — ver perfil de cualquier usuario (admin)
             get("{uid}") {
                 if (!call.requireAdmin()) return@get
@@ -41,9 +56,7 @@ fun Route.userRoutes() {
                 call.respond(ApiResponse(success = true, data = profile))
             }
 
-            // PATCH /api/v1/users/{uid}/role — cambiar rol de un usuario (solo admin)
-            // Uso: primero crea la cuenta del baker, luego llama este endpoint con role=BAKER,
-            // luego crea la panadería con su ownerId. El orden importa.
+            // PATCH /api/v1/users/{uid}/role — cambiar rol (solo admin)
             patch("{uid}/role") {
                 if (!call.requireAdmin()) return@patch
                 val uid = call.parameters["uid"] ?: throw IllegalArgumentException("uid requerido")

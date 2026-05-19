@@ -45,6 +45,7 @@ object ProductService {
             "imageUrl"           to request.imageUrl,
             "advanceMinutes"     to request.advanceMinutes,
             "available"          to (request.stock > 0 && request.available)
+
         )
         val id = FirestoreService.createDocumentAutoId(PRODUCTS, data)
         return getProductById(id)
@@ -60,6 +61,10 @@ object ProductService {
         request.description?.let        { updates["description"]        = it }
         request.imageUrl?.let           { updates["imageUrl"]           = it }
         request.advanceMinutes?.let     { updates["advanceMinutes"]     = it }
+        request.stock?.let     { updates["stock"]     = it }
+        request.available?.let { updates["available"] = it }
+
+
 
         if (updates.isNotEmpty()) {
             FirestoreService.updateDocument(PRODUCTS, productId, updates)

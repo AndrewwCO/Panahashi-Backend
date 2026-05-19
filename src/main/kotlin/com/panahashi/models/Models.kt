@@ -28,7 +28,8 @@ data class Bakery(
     val totalReviews: Int = 0,
     val status: BakeryStatus = BakeryStatus.ACTIVE,
     val ownerId: String = "",
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val available: Boolean? = null
 )
 
 @Serializable
@@ -120,7 +121,9 @@ data class UpdateProductRequest(
     val category: String? = null,
     val description: String? = null,
     val imageUrl: String? = null,
-    val advanceMinutes: Int? = null
+    val advanceMinutes: Int? = null,
+    val stock: Int? = null,
+    val available: Boolean? = null
 )
 
 @Serializable
